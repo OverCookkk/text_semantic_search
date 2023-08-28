@@ -1,5 +1,7 @@
 import os
 from utils.milvus_handler import MilvusHandler
+from utils.mysql_handler import MySQLHandler
+from utils.encode import SentenceModel
 from fastapi import FastAPI, UploadFile, File
 import uvicorn
 from logs import LOGGER
@@ -7,6 +9,8 @@ from service.store import do_store
 
 app = FastAPI()
 milvus_client = MilvusHandler()
+mysql_client = MySQLHandler()
+encode_model = SentenceModel()
 
 
 @app.post('/store_test')
@@ -25,7 +29,7 @@ async def store_test(file: UploadFile = File(...), collection_name: str = None):
         return {'status': -1, 'msg': 'Failed to load data.'}
 
     try:
-        count = do_store(collection_name, milvus_client)
+        count = do_store(collection_name, file_path, milvus_client, mysql_client, encode_model)
         LOGGER.info(f"Successfully loaded data, total count: {count}")
         return {'status': 0, 'msg': 'store data success.'}
     except Exception as e:

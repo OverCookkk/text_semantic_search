@@ -10,6 +10,7 @@ import os
 sys.path.append('../')
 from config import MODEL_PATH
 
+
 class SentenceModel:
     """
     Say something about the ExampleCalass...
@@ -18,6 +19,7 @@ class SentenceModel:
         args_0 (`type`):
         ...
     """
+
     def __init__(self):
         if not os.path.exists(MODEL_PATH):
             os.makedirs(MODEL_PATH)

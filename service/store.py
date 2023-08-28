@@ -3,8 +3,9 @@ import sys
 import pandas as pd
 
 sys.path.append('../')
-# from config import MILVUS_HOST, MILVUS_PORT, VECTOR_DIMENSION, METRIC_TYPE
+from config import DEFAULT_TABLE
 from logs import LOGGER
+
 
 def extract_features(file_dir, encode_model):
     try:
@@ -17,11 +18,24 @@ def extract_features(file_dir, encode_model):
         LOGGER.error(f" Error with extracting feature from question {e}")
 
 
-def do_store(collection_name, file_dir, milvus_client, encode_model):
-    # 先转embedding
+def format_data(ids, title_data, text_data):
+    data = []
+    for i in range(len(ids)):
+        value = str(ids[i]) + title_data[i] + text_data[i]
+        data.append(value)
+    return data
+
+
+def do_store(collection_name, file_dir, milvus_client, mysql_client, encode_model):
+    if not collection_name:
+        collection_name = DEFAULT_TABLE
+
+    # embedding
     title_data, text_data, sentence_embeddings = extract_features(file_dir, encode_model)
     # 插入milvus
     ids = milvus_client.insert(collection_name, sentence_embeddings)
     # 插入数据库
+    mysql_client.create_mysql_table(collection_name)
+    mysql_client.insert_data_to_mysql(collection_name, format_data(ids, title_data, text_data))
 
     return len(ids)
