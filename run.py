@@ -1,4 +1,5 @@
 import os
+
 from utils.milvus_handler import MilvusHandler
 from utils.mysql_handler import MySQLHandler
 from utils.encode import SentenceModel
@@ -6,14 +7,23 @@ from fastapi import FastAPI, UploadFile, File
 import uvicorn
 from logs import LOGGER
 from service.store import do_store
+from service.count import do_count
+
+from config import MILVUS_HOST, MILVUS_PORT
+
+MYSQL_HOST = "172.31.61.41"
+MYSQL_USER = "hwdata"
+MYSQL_PORT = 3306
+MYSQL_PWD = "Pass4dat@2018!0"
+MYSQL_DB = "test"
 
 app = FastAPI()
-milvus_client = MilvusHandler()
-mysql_client = MySQLHandler()
+milvus_client = MilvusHandler(MILVUS_HOST, MILVUS_PORT)
+mysql_client = MySQLHandler(MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PWD, MYSQL_DB)
 encode_model = SentenceModel()
 
 
-@app.post('/store_test')
+@app.post('/store_text')
 async def store_test(file: UploadFile = File(...), collection_name: str = None):
     # 加载文件
     try:
@@ -36,6 +46,15 @@ async def store_test(file: UploadFile = File(...), collection_name: str = None):
         LOGGER.error(e)
         return {'status': -1, 'msg': "store text data failed."}
 
+@app.post('/count')
+async def count_text(table_name: str = None):
+    try:
+        num = do_count(table_name, milvus_client)
+        LOGGER.info("Successfully count the number of titles!")
+        return num
+    except Exception as e:
+        LOGGER.error(e)
+        return {'status': -1, 'msg': e}, 400
 
 if __name__ == '__main__':
-    uvicorn.run(app=app, host='127.0.0.1', port=8000)
+    uvicorn.run(app=app, host='127.0.0.1', port=8010)
