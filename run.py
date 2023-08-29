@@ -8,13 +8,14 @@ import uvicorn
 from logs import LOGGER
 from service.store import do_store
 from service.count import do_count
+from service.search import do_search
 
 from config import MILVUS_HOST, MILVUS_PORT
 
-MYSQL_HOST = "172.31.61.41"
-MYSQL_USER = "hwdata"
+MYSQL_HOST = "127.0.0.1"
+MYSQL_USER = ""
 MYSQL_PORT = 3306
-MYSQL_PWD = "Pass4dat@2018!0"
+MYSQL_PWD = ""
 MYSQL_DB = "test"
 
 app = FastAPI()
@@ -55,6 +56,20 @@ async def count_text(table_name: str = None):
     except Exception as e:
         LOGGER.error(e)
         return {'status': -1, 'msg': e}, 400
+
+@app.get('/search')
+def search_text(table_name: str = None, query_sentence:str = None):
+    try:
+        _, title, text, distance = do_search(table_name, query_sentence, milvus_client, mysql_client, encode_model)
+        res = []
+        for x, y, z in zip(title, text, distance):
+            res.append({'title:': x, 'content': y, 'distance': z})
+        LOGGER.debug(f"search result:{res}")
+        return res
+    except Exception as e:
+        LOGGER.error(e)
+        return {'status': -1, 'msg': e}, 400
+
 
 if __name__ == '__main__':
     uvicorn.run(app=app, host='127.0.0.1', port=8010)

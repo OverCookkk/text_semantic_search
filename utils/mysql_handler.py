@@ -38,3 +38,19 @@ class MySQLHandler():
         except Exception as e:
             LOGGER.error(f"MYSQL ERROR: {e} with sql: {sql}")
             # sys.exit(1)
+
+    def search_by_milvus_ids(self, table_name, ids):
+        # Get the img_path according to the milvus ids
+        str_ids = str(ids).replace('[', '').replace(']', '')
+        sql = "select * from " + table_name + " where milvus_id in (" + str_ids + ") order by field (milvus_id," + str_ids + ");"
+        try:
+            self.cursor.execute(sql)
+            results = self.cursor.fetchall()
+            results_id = [res[0] for res in results]
+            results_title = [res[1] for res in results]
+            results_text = [res[2] for res in results]
+            LOGGER.debug("MYSQL search by milvus id.")
+            return results_id, results_title, results_text
+        except Exception as e:
+            LOGGER.error(f"MYSQL ERROR: {e} with sql: {sql}")
+            sys.exit(1)

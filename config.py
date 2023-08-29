@@ -1,6 +1,6 @@
 
 ############### Milvus Configuration ###############
-MILVUS_HOST = "172.31.175.230"
+MILVUS_HOST = "127.0.0.1"
 MILVUS_PORT = 19530
 VECTOR_DIMENSION = 768
 INDEX_FILE_SIZE = 1024

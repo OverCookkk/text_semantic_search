@@ -75,3 +75,15 @@ class MilvusHandler:
         except Exception as e:
             LOGGER.error(f"Failed to count vectors in Milvus: {e}")
             sys.exit(1)
+
+    def search(self, collection_name, vectors, top_k):
+        try:
+            self.set_collection(collection_name)
+            search_params = {"metric_type": METRIC_TYPE, "params": {"nprobe": 16}}
+            # vectors: list[list[Float]]
+            res = self.collection.search(vectors, anns_field="embedding", param=search_params, limit=top_k)
+            LOGGER.debug(f"Successfully search in collection: {res}")
+            return res
+        except Exception as e:
+            LOGGER.error(f"Failed to search in Milvus: {e}")
+            sys.exit(1)
