@@ -25,4 +25,4 @@ bert是Google开源的一个通用的语言表示模型，milvus是一个特向�
 
 2、在`config.py`和`run.py`中填好milvus和mysql的配置后，执行`python run.py`启动服务。
 
-3、`test_main.py`为测试代码。
+3、`test_main.py`为测试代码，导入的文本文件格式为csv，包含`title`和`text`两个字段。
