@@ -87,3 +87,15 @@ class MilvusHandler:
         except Exception as e:
             LOGGER.error(f"Failed to search in Milvus: {e}")
             sys.exit(1)
+
+    def upsert(self, collection_name, mId, vectors):
+        try:
+            self.set_collection(collection_name)
+            data = [mId, vectors]
+            res = self.collection.upsert(data)
+            mr = self.collection.upsert(data)
+            LOGGER.debug(f"Successfully search in collection: {res}")
+            return res
+        except Exception as e:
+            LOGGER.error(f"Failed to upsert in Milvus: {e}")
+            sys.exit(1)
