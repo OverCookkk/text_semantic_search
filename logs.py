@@ -112,7 +112,7 @@ def write_log():
     stream_handler.setFormatter(fmt)
 
     log_name = "milvus"
-    file_handler = MultiprocessHandler(log_name, when='D', backupCount=LOGS_NUM)
+    file_handler = MultiprocessHandler(log_name, when='D', backupCount=0)
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(fmt)
     file_handler.doChangeFile()
